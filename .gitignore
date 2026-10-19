@@ -1,0 +1,4 @@
+# gdm 关闭假显示器后留下的备份
+*.disabled
+.DS_Store
+__pycache__/

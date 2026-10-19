@@ -1,0 +1,20 @@
+#!/bin/bash
+# headless on|off —— NVIDIA 软件假显示器模式切换
+# on:  启用假显示器配置（无需插线，远程桌面正常使用）
+# off: 停用假显示器（之后把视频线插到显卡上接真显示器）
+# 依赖: /etc/X11/xorg.conf.d/10-headless-nvidia.conf 与 /etc/X11/edid-headless.bin
+CONF=/etc/X11/xorg.conf.d/10-headless-nvidia.conf
+case "$1" in
+  on)
+    if [ -f "$CONF.disabled" ]; then mv "$CONF.disabled" "$CONF"; fi
+    [ -f "$CONF" ] && echo "已启用 headless（假显示器 2560x1440）"
+    ;;
+  off)
+    if [ -f "$CONF" ]; then mv "$CONF" "$CONF.disabled"; echo "已停用 headless（请把线插到显卡上）"; fi
+    ;;
+  *)
+    echo "用法: sudo headless on|off"; exit 1
+    ;;
+esac
+echo "重启图形界面（约10秒，之后远程桌面需重新连接）..."
+systemctl restart gdm3
