@@ -54,7 +54,7 @@ echo $XDG_SESSION_TYPE
 ### 一键安装
 
 ```bash
-git clone https://github.com/<you>/nvidia-headless.git
+git clone https://github.com/JunjieWang-ai/nvidia-headless.git
 cd nvidia-headless
 sudo bash install.sh
 ```
@@ -82,11 +82,9 @@ sudo headless on    # 恢复无头模式
 
 不想手动敲命令？把下面整段提示词复制给你机器上的 AI 编程助手（ZCode / Claude Code / Cursor 等），它会自动完成**下载 → 体检 → 安装 → 测试 → 生效**全流程，并在中断远程连接等关键节点先征求你的同意：
 
-> 使用前把提示词里的仓库地址替换为本仓库实际地址。
-
 ```text
 请帮我在这台机器上部署 nvidia-headless（NVIDIA 无头远程桌面假显示器方案）。
-项目仓库：https://github.com/<你的用户名>/nvidia-headless
+项目仓库：https://github.com/JunjieWang-ai/nvidia-headless
 （若本机已有该仓库目录，直接使用即可）
 
 请严格按以下步骤执行，不要跳步：
