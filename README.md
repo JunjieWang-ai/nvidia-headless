@@ -15,6 +15,7 @@
 
 - [解决什么问题](#解决什么问题)
 - [快速开始](#快速开始)
+- [让 AI 全自动部署（复制这段提示词）](#让-ai-全自动部署复制这段提示词)
 - [目录结构](#目录结构)
 - [原理与配置解析](#原理与配置解析踩坑实录)
 - [安全验证方法](#安全验证方法不动现有会话)
@@ -76,6 +77,45 @@ sudo headless on    # 恢复无头模式
 ### 手动安装
 
 不愿跑脚本的话，手动四步：`2560x1440.bin → /etc/X11/edid-headless.bin`、`10-headless-nvidia.conf → /etc/X11/xorg.conf.d/`、`headless → /usr/local/bin/`、重启 gdm。
+
+## 让 AI 全自动部署（复制这段提示词）
+
+不想手动敲命令？把下面整段提示词复制给你机器上的 AI 编程助手（ZCode / Claude Code / Cursor 等），它会自动完成**下载 → 体检 → 安装 → 测试 → 生效**全流程，并在中断远程连接等关键节点先征求你的同意：
+
+> 使用前把提示词里的仓库地址替换为本仓库实际地址。
+
+```text
+请帮我在这台机器上部署 nvidia-headless（NVIDIA 无头远程桌面假显示器方案）。
+项目仓库：https://github.com/<你的用户名>/nvidia-headless
+（若本机已有该仓库目录，直接使用即可）
+
+请严格按以下步骤执行，不要跳步：
+
+1.【阅读】克隆仓库（GitHub 直连失败时用镜像加速，如把原地址前缀改为
+   https://ghfast.top/https://github.com/... ），通读 README.md 与 SKILL.md，
+   理解原理与风险后再动手。
+2.【体检】确认环境满足前提，并向我汇报结果：
+   - nvidia-smi 可用（记录显卡型号与驱动版本）；
+   - 会话类型为 X11（echo $XDG_SESSION_TYPE）；
+     若是 Wayland：停止部署，向我说明切换 X11 的方法，不要擅自改动；
+   - 询问我用什么远程桌面（向日葵/ToDesk 等）连接本机、是否正连着。
+3.【安装】运行 sudo bash install.sh；脚本报出环境问题时如实转告我，不要自行绕过。
+4.【测试】按 README「安全验证方法」用一次性 X 服务器验证配置：
+   sudo Xorg :9 -config <仓库>/10-headless-nvidia.conf -configdir <空目录> -ac vt9
+   判定标准：DISPLAY=:9 xrandr 显示 HDMI-0 connected 2560x1440；
+   测完必须清理测试 X 进程。
+   若测试失败：不要重启图形界面，把 X 日志中的 (EE) 行发给我，等待指示。
+5.【生效】测试通过后，先告诉我"即将重启图形界面，远程连接会断开约 10 秒"，
+   征得我同意后再执行 sudo systemctl restart gdm3；
+   等待约 20 秒，验证 DISPLAY=:0 下 xrandr 显示 connected。
+   若机器没开自动登录，提醒我需要在远程桌面里手动登录一次。
+6.【收尾】输出总结：安装了哪些文件、测试结果、生效状态、当前 GPU 功耗（nvidia-smi），
+   以及回滚方法（sudo headless off，需要时再重启图形界面即可换回真显示器）。
+
+注意事项：
+- 所有需要 root 的命令用 sudo 执行；若 sudo 需要密码，先向我要。
+- 任何会中断远程连接的操作必须先提示我、征得同意；不要动我的其他数据与服务。
+```
 
 ## 目录结构
 
@@ -146,7 +186,7 @@ sudo pkill -f "Xorg :9"
 
 ## 功耗实测与省电建议
 
-（RTX 3090 Ti + Ryzen 7 5700G + Ubuntu 24.04，turbostat + RAPL 实测）
+（RTX 3090/4090/5090 Ti + Ryzen 7 5700G + Ubuntu 24.04，turbostat + RAPL 实测）
 
 | 状态 | GPU 功耗 | 说明 |
 |---|---|---|
@@ -209,4 +249,4 @@ Issue / PR 均欢迎，特别期待：
 
 - [akatrevorjay/edid-generator](https://github.com/akatrevorjay/edid-generator)（EDID 模板与构建方法）
 - NVIDIA Linux 驱动文档（ConnectedMonitor / CustomEDID / ModeValidation 章节）
-- 实测环境与数据：RTX 3090 Ti + Ryzen 7 5700G + Ubuntu 24.04.4 + 向日葵，2026-10
+- 实测环境与数据：RTX 4090 Ti + Ryzen 7 5700G + Ubuntu 24.04.4 + 向日葵，2026-10
